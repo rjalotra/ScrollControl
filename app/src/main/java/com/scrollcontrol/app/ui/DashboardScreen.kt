@@ -71,64 +71,73 @@ fun DashboardScreen(modifier: Modifier = Modifier) {
             .fillMaxSize()
             .background(ZenDarkBackground)
             .verticalScroll(scrollState)
-            .padding(horizontal = 18.dp, vertical = 14.dp),
+            .padding(horizontal = 18.dp, vertical = 12.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        // Japanese Floral Minimalist Header
-        Row(
+        // Japanese Cherry Blossom Hero Banner (Photographic branch with graceful depth)
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 8.dp, bottom = 4.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+                .wrapContentHeight()
         ) {
-            Column {
+            SakuraBranchHero(
+                modifier = Modifier.fillMaxWidth(),
+                height = 145
+            )
+
+            // Dynamic vector twig with blossoming flowers growing across the top header
+            SakuraTwigCanvas(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(145.dp)
+            )
+
+            // Header Title overlay with positive, serene branding
+            Column(
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+                    .padding(start = 14.dp, bottom = 10.dp)
+            ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Text(
                         text = "ScrollControl",
-                        fontSize = 26.sp,
+                        fontSize = 24.sp,
                         fontWeight = FontWeight.ExtraBold,
                         color = Color.White,
                         letterSpacing = (-0.5).sp
                     )
                     Surface(
-                        shape = RoundedCornerShape(12.dp),
-                        color = SakuraPink.copy(alpha = 0.15f),
-                        border = BorderStroke(1.dp, SakuraPink.copy(alpha = 0.35f))
+                        shape = RoundedCornerShape(10.dp),
+                        color = SakuraPetalDeep.copy(alpha = 0.35f),
+                        border = BorderStroke(1.dp, SakuraPetalMid.copy(alpha = 0.5f))
                     ) {
                         Text(
-                            text = "桜 ZEN",
-                            fontSize = 10.sp,
+                            text = "桜 SAKURA",
+                            fontSize = 9.sp,
                             fontWeight = FontWeight.Bold,
-                            color = SakuraPink,
-                            modifier = Modifier.padding(horizontal = 7.dp, vertical = 2.dp)
+                            color = SakuraPetalSoft,
+                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
                         )
                     }
                 }
-                Spacer(modifier = Modifier.height(2.dp))
                 Text(
                     text = "Mindful Instagram protection & calm focus",
-                    fontSize = 13.sp,
-                    color = ZenMutedText
+                    fontSize = 12.sp,
+                    color = SakuraPetalSoft.copy(alpha = 0.85f)
                 )
             }
-
-            // Close-up Japanese Sakura Blossom
-            SakuraFlower(
-                modifier = Modifier.size(46.dp)
-            )
         }
 
         // Accessibility Permission Notice (if needed)
         if (!isAccessibilityEnabled) {
             Card(
                 colors = CardDefaults.cardColors(
-                    containerColor = Color(0xFF2D161C)
+                    containerColor = Color(0xFF261419)
                 ),
-                border = BorderStroke(1.dp, SakuraDeep.copy(alpha = 0.4f)),
+                border = BorderStroke(1.dp, SakuraPetalDeep.copy(alpha = 0.5f)),
                 shape = RoundedCornerShape(20.dp),
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -140,12 +149,12 @@ fun DashboardScreen(modifier: Modifier = Modifier) {
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        SinglePetal(tint = SakuraDeep)
+                        SinglePetal(tint = SakuraPetalDeep)
                         Text(
                             text = "Accessibility Permission Required",
                             fontWeight = FontWeight.Bold,
                             fontSize = 14.sp,
-                            color = Color(0xFFFFCCD5)
+                            color = SakuraPetalSoft
                         )
                     }
                     Text(
@@ -162,12 +171,12 @@ fun DashboardScreen(modifier: Modifier = Modifier) {
                             context.startActivity(intent)
                         },
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = SakuraDeep
+                            containerColor = SakuraPetalDeep
                         ),
                         shape = RoundedCornerShape(10.dp),
                         modifier = Modifier.align(Alignment.End)
                     ) {
-                        Text("Enable in Settings", fontSize = 12.sp)
+                        Text("Enable in Settings", fontSize = 12.sp, color = Color.White)
                     }
                 }
             }
@@ -185,7 +194,7 @@ fun DashboardScreen(modifier: Modifier = Modifier) {
                 width = 1.dp,
                 brush = Brush.linearGradient(
                     listOf(
-                        if (settings.isBlockerEnabled && isAccessibilityEnabled) SakuraPink.copy(alpha = 0.6f) else Color(0x22FFFFFF),
+                        if (settings.isBlockerEnabled && isAccessibilityEnabled) SakuraPetalMid.copy(alpha = 0.6f) else Color(0x22FFFFFF),
                         Color(0x11FFFFFF)
                     )
                 )
@@ -204,26 +213,21 @@ fun DashboardScreen(modifier: Modifier = Modifier) {
                     horizontalArrangement = Arrangement.spacedBy(14.dp),
                     modifier = Modifier.weight(1f)
                 ) {
-                    // Visual state icon with glowing sakura or soft slate
                     Box(
                         modifier = Modifier
                             .size(48.dp)
                             .clip(CircleShape)
                             .background(
                                 if (settings.isBlockerEnabled && isAccessibilityEnabled)
-                                    Brush.radialGradient(listOf(SakuraPink.copy(alpha = 0.3f), Color.Transparent))
+                                    Brush.radialGradient(listOf(SakuraPetalMid.copy(alpha = 0.35f), Color.Transparent))
                                 else
-                                    Color(0xFF23202A)
+                                    Color(0xFF231E24)
                             ),
                         contentAlignment = Alignment.Center
                     ) {
                         SakuraFlower(
                             modifier = Modifier.size(34.dp),
-                            petalGradient = if (settings.isBlockerEnabled && isAccessibilityEnabled)
-                                listOf(Color(0xFFFF94AF), Color(0xFFFF5277))
-                            else
-                                listOf(Color(0xFF706B78), Color(0xFF4C4753)),
-                            stamenColor = if (settings.isBlockerEnabled && isAccessibilityEnabled) GoldAccent else Color.Gray
+                            stamenColor = if (settings.isBlockerEnabled && isAccessibilityEnabled) SakuraPollenGold else Color.Gray
                         )
                     }
 
@@ -238,7 +242,7 @@ fun DashboardScreen(modifier: Modifier = Modifier) {
                                     .clip(CircleShape)
                                     .background(
                                         if (settings.isBlockerEnabled && isAccessibilityEnabled) ZenActiveGreen
-                                        else if (!isAccessibilityEnabled) GoldAccent
+                                        else if (!isAccessibilityEnabled) SakuraPollenGold
                                         else Color.Gray
                                     )
                             )
@@ -267,9 +271,9 @@ fun DashboardScreen(modifier: Modifier = Modifier) {
                     },
                     colors = SwitchDefaults.colors(
                         checkedThumbColor = Color.White,
-                        checkedTrackColor = SakuraPink,
+                        checkedTrackColor = SakuraPetalDeep,
                         uncheckedThumbColor = Color.Gray,
-                        uncheckedTrackColor = Color(0xFF2C2834)
+                        uncheckedTrackColor = Color(0xFF2C242C)
                     )
                 )
             }
@@ -284,7 +288,7 @@ fun DashboardScreen(modifier: Modifier = Modifier) {
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(6.dp)
             ) {
-                SinglePetal(tint = SakuraPink, modifier = Modifier.size(14.dp))
+                SinglePetal(tint = SakuraPetalMid, modifier = Modifier.size(14.dp))
                 Text(
                     text = "Protection Rules",
                     fontSize = 14.sp,
@@ -371,17 +375,12 @@ fun DashboardScreen(modifier: Modifier = Modifier) {
             modifier = Modifier.fillMaxWidth()
         ) {
             Column(modifier = Modifier.padding(18.dp)) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(6.dp)
-                ) {
-                    Text(
-                        text = "Focus Impact",
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White
-                    )
-                }
+                Text(
+                    text = "Focus Impact",
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
                 Spacer(modifier = Modifier.height(14.dp))
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -407,13 +406,13 @@ fun DashboardScreen(modifier: Modifier = Modifier) {
             }
         }
 
-        // Floating Overlay Window Preview Card with Sakura Theme
+        // Floating Overlay Window Preview Card with Twig Branch Styling
         Card(
             shape = RoundedCornerShape(22.dp),
             colors = CardDefaults.cardColors(
                 containerColor = ZenCardSurface
             ),
-            border = BorderStroke(1.dp, SakuraPink.copy(alpha = 0.25f)),
+            border = BorderStroke(1.dp, SakuraPetalMid.copy(alpha = 0.25f)),
             modifier = Modifier.fillMaxWidth()
         ) {
             Column(modifier = Modifier.padding(18.dp)) {
@@ -426,7 +425,7 @@ fun DashboardScreen(modifier: Modifier = Modifier) {
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        SinglePetal(tint = SakuraPink, modifier = Modifier.size(16.dp))
+                        SinglePetal(tint = SakuraPetalMid, modifier = Modifier.size(16.dp))
                         Text(
                             text = "Motivational Quote Preview",
                             fontSize = 14.sp,
@@ -442,7 +441,7 @@ fun DashboardScreen(modifier: Modifier = Modifier) {
                         Icon(
                             imageVector = Icons.Default.Refresh,
                             contentDescription = "Shuffle",
-                            tint = SakuraPink,
+                            tint = SakuraPetalMid,
                             modifier = Modifier.size(16.dp)
                         )
                     }
@@ -469,7 +468,7 @@ fun DashboardScreen(modifier: Modifier = Modifier) {
                             text = "— ${previewQuote.author} (${previewQuote.category})",
                             fontSize = 11.sp,
                             fontWeight = FontWeight.SemiBold,
-                            color = SakuraSoft
+                            color = SakuraPetalSoft
                         )
                     }
                 }
@@ -494,8 +493,8 @@ fun DashboardScreen(modifier: Modifier = Modifier) {
                             }
                         },
                         shape = RoundedCornerShape(12.dp),
-                        border = BorderStroke(1.dp, SakuraPink.copy(alpha = 0.4f)),
-                        colors = ButtonDefaults.outlinedButtonColors(contentColor = SakuraSoft),
+                        border = BorderStroke(1.dp, SakuraPetalMid.copy(alpha = 0.4f)),
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = SakuraPetalSoft),
                         modifier = Modifier.weight(1f)
                     ) {
                         Text("Test Reels Tab", fontSize = 11.sp, fontWeight = FontWeight.SemiBold)
@@ -543,7 +542,7 @@ fun DashboardScreen(modifier: Modifier = Modifier) {
             },
             shape = RoundedCornerShape(16.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = SakuraDeep
+                containerColor = SakuraPetalDeep
             ),
             modifier = Modifier
                 .fillMaxWidth()
@@ -622,7 +621,7 @@ private fun RuleRowItem(
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                tint = if (checked) SakuraPink else Color.Gray,
+                tint = if (checked) SakuraPetalMid else Color.Gray,
                 modifier = Modifier.size(20.dp)
             )
             Column {
@@ -649,9 +648,9 @@ private fun RuleRowItem(
             onCheckedChange = onCheckedChange,
             colors = SwitchDefaults.colors(
                 checkedThumbColor = Color.White,
-                checkedTrackColor = SakuraPink,
+                checkedTrackColor = SakuraPetalDeep,
                 uncheckedThumbColor = Color.Gray,
-                uncheckedTrackColor = Color(0xFF2C2834)
+                uncheckedTrackColor = Color(0xFF2C242C)
             )
         )
     }
@@ -664,7 +663,7 @@ private fun StatItem(icon: ImageVector, value: String, label: String) {
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                tint = SakuraPink,
+                tint = SakuraPetalMid,
                 modifier = Modifier.size(16.dp)
             )
             Spacer(modifier = Modifier.width(6.dp))

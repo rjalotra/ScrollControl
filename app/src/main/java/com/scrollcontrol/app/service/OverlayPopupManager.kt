@@ -78,7 +78,7 @@ class OverlayLifecycleOwner : SavedStateRegistryOwner, ViewModelStoreOwner {
 
 /**
  * Truecaller-style floating overlay window manager decorated with a positive,
- * minimalist Japanese floral (Sakura) theme that draws directly on top of Instagram.
+ * minimalist Japanese floral branch aesthetic that draws directly on top of Instagram.
  */
 class OverlayPopupManager(private val context: Context) {
 
@@ -152,7 +152,7 @@ class OverlayPopupManager(private val context: Context) {
                         .padding(horizontal = 20.dp, vertical = 24.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    // Minimalist Japanese Floral Floating Card
+                    // Minimalist Japanese Floral Floating Card with Twig Branch Motif
                     Card(
                         shape = RoundedCornerShape(28.dp),
                         colors = CardDefaults.cardColors(
@@ -162,7 +162,7 @@ class OverlayPopupManager(private val context: Context) {
                             width = 1.dp,
                             brush = Brush.linearGradient(
                                 listOf(
-                                    SakuraPink.copy(alpha = 0.7f),
+                                    SakuraPetalMid.copy(alpha = 0.7f),
                                     SecondaryAccent.copy(alpha = 0.4f),
                                     Color(0x22FFFFFF)
                                 )
@@ -178,7 +178,7 @@ class OverlayPopupManager(private val context: Context) {
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .verticalScroll(rememberScrollState())
-                                .padding(22.dp)
+                                .padding(20.dp)
                         ) {
                             // Top Bar: Sakura Badge & Close Button
                             Row(
@@ -189,19 +189,19 @@ class OverlayPopupManager(private val context: Context) {
                                 Surface(
                                     shape = RoundedCornerShape(50),
                                     color = Color(0xFF251F2A),
-                                    border = BorderStroke(1.dp, SakuraPink.copy(alpha = 0.4f))
+                                    border = BorderStroke(1.dp, SakuraPetalMid.copy(alpha = 0.4f))
                                 ) {
                                     Row(
                                         verticalAlignment = Alignment.CenterVertically,
                                         horizontalArrangement = Arrangement.spacedBy(6.dp),
                                         modifier = Modifier.padding(horizontal = 12.dp, vertical = 5.dp)
                                     ) {
-                                        SinglePetal(tint = SakuraPink, modifier = Modifier.size(10.dp))
+                                        SinglePetal(tint = SakuraPetalMid, modifier = Modifier.size(10.dp))
                                         Text(
                                             text = if (isDmScroll) "DM Reel Scroll Locked" else "Reels Scrolling Locked",
                                             fontSize = 11.sp,
                                             fontWeight = FontWeight.Bold,
-                                            color = SakuraSoft,
+                                            color = SakuraPetalSoft,
                                             letterSpacing = 0.4.sp
                                         )
                                     }
@@ -223,28 +223,20 @@ class OverlayPopupManager(private val context: Context) {
                                 }
                             }
 
-                            Spacer(modifier = Modifier.height(12.dp))
+                            Spacer(modifier = Modifier.height(10.dp))
 
-                            // Close-up Japanese Sakura Flower in Center
+                            // Twig with Budding Flowers Branch Header
                             Box(
                                 modifier = Modifier
-                                    .size(68.dp)
-                                    .clip(CircleShape)
-                                    .background(
-                                        Brush.radialGradient(
-                                            listOf(SakuraPink.copy(alpha = 0.25f), Color.Transparent)
-                                        )
-                                    ),
-                                contentAlignment = Alignment.Center
+                                    .fillMaxWidth()
+                                    .height(78.dp)
                             ) {
-                                SakuraFlower(
-                                    modifier = Modifier.size(54.dp),
-                                    petalGradient = listOf(Color(0xFFFF9EB5), Color(0xFFFF4D74)),
-                                    stamenColor = GoldAccent
+                                SakuraTwigCanvas(
+                                    modifier = Modifier.fillMaxSize()
                                 )
                             }
 
-                            Spacer(modifier = Modifier.height(10.dp))
+                            Spacer(modifier = Modifier.height(4.dp))
 
                             // Title & Subtitle with Positive Vibe
                             Text(
@@ -288,13 +280,13 @@ class OverlayPopupManager(private val context: Context) {
                                     ) {
                                         Surface(
                                             shape = RoundedCornerShape(6.dp),
-                                            color = SakuraPink.copy(alpha = 0.15f)
+                                            color = SakuraPetalDeep.copy(alpha = 0.15f)
                                         ) {
                                             Text(
                                                 text = currentQuote.category.uppercase(),
                                                 fontSize = 9.sp,
                                                 fontWeight = FontWeight.ExtraBold,
-                                                color = SakuraSoft,
+                                                color = SakuraPetalSoft,
                                                 modifier = Modifier.padding(horizontal = 7.dp, vertical = 2.dp),
                                                 letterSpacing = 0.4.sp
                                             )
@@ -309,7 +301,7 @@ class OverlayPopupManager(private val context: Context) {
                                             Icon(
                                                 imageVector = Icons.Default.Refresh,
                                                 contentDescription = "New Quote",
-                                                tint = SakuraPink,
+                                                tint = SakuraPetalMid,
                                                 modifier = Modifier.size(16.dp)
                                             )
                                         }
@@ -324,7 +316,7 @@ class OverlayPopupManager(private val context: Context) {
                                         Icon(
                                             imageVector = Icons.Default.FormatQuote,
                                             contentDescription = null,
-                                            tint = SakuraPink.copy(alpha = 0.8f),
+                                            tint = SakuraPetalMid.copy(alpha = 0.8f),
                                             modifier = Modifier
                                                 .size(20.dp)
                                                 .padding(top = 2.dp)
@@ -346,7 +338,7 @@ class OverlayPopupManager(private val context: Context) {
                                         text = "— ${currentQuote.author}",
                                         fontSize = 11.sp,
                                         fontWeight = FontWeight.Bold,
-                                        color = SakuraSoft,
+                                        color = SakuraPetalSoft,
                                         textAlign = TextAlign.End,
                                         modifier = Modifier.fillMaxWidth()
                                     )
@@ -362,7 +354,7 @@ class OverlayPopupManager(private val context: Context) {
                                     onGoToDms()
                                 },
                                 colors = ButtonDefaults.buttonColors(
-                                    containerColor = SakuraDeep
+                                    containerColor = SakuraPetalDeep
                                 ),
                                 shape = RoundedCornerShape(12.dp),
                                 modifier = Modifier
