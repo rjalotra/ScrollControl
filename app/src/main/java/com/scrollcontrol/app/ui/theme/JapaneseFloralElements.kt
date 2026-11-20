@@ -25,15 +25,6 @@ import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
 
-// Reference Color Palette extracted directly from the user's photograph
-val TwigWoodColor = Color(0xFF4A252C)
-val TwigWoodDark = Color(0xFF2E151A)
-val SakuraPetalSoft = Color(0xFFFBE3E9)
-val SakuraPetalMid = Color(0xFFEDA3B4)
-val SakuraPetalDeep = Color(0xFFC74360)
-val SakuraPollenGold = Color(0xFFFFBF42)
-val SakuraBudCrimson = Color(0xFF9E233E)
-val LeafBronze = Color(0xFF5E2730)
 
 /**
  * Hero Banner displaying the authentic cherry blossom branch photo with
