@@ -2,7 +2,9 @@ package com.scrollcontrol.app.service
 
 import android.accessibilityservice.AccessibilityService
 import android.accessibilityservice.AccessibilityServiceInfo
+import android.accessibilityservice.GestureDescription
 import android.content.Intent
+import android.graphics.Path
 import android.graphics.Rect
 import android.net.Uri
 import android.os.Build
@@ -28,15 +30,15 @@ class InstagramReelsBlockerService : AccessibilityService() {
 
     companion object {
         private const val TAG = "ScrollControlService"
-        private const val BLOCK_COOLDOWN_MS = 2000L
+        private const val BLOCK_COOLDOWN_MS = 1500L
 
         var isServiceRunning: Boolean = false
             private set
 
-        // Grace window (e.g. 4 seconds) to let user switch back to Feed or DMs safely
+        // Grace window (e.g. 6 seconds) to let user switch back to Feed or DMs safely
         var suppressBlockingUntil: Long = 0L
 
-        // Set to true when user taps "Back to Feed" or "Back to DMs" so the service auto-taps the Home tab
+        // Set to true ONLY when user taps "Back to Feed" so the service auto-taps the Home tab
         var pendingNavigateToHome: Boolean = false
 
         // Instance pointer for direct dashboard preview testing of the overlay window
@@ -81,7 +83,6 @@ class InstagramReelsBlockerService : AccessibilityService() {
 
         // 2. If the overlay is already displayed, keep it stable and do not re-trigger or auto-dismiss
         if (::overlayManager.isInitialized && overlayManager.isShowing) {
-            // Dismiss only if the user explicitly switched away to their home screen launcher
             if (isHomeLauncherPackage(packageName)) {
                 overlayManager.hide()
             }
@@ -108,7 +109,7 @@ class InstagramReelsBlockerService : AccessibilityService() {
         val maxTabHeightPx = (140 * density).toInt()
         val maxTabWidthPx = (windowWidth * 0.40f).toInt()
 
-        // If resuming from Scrolling Lock, auto-switch to Home tab to unselect Reels
+        // ONLY auto-switch to Home tab if user explicitly tapped "Back to Feed" (never for DMs!)
         if (pendingNavigateToHome) {
             val homeTab = findHomeTabNode(rootNode, 0, bottomBarMinY)
             if (homeTab != null) {
@@ -402,8 +403,27 @@ class InstagramReelsBlockerService : AccessibilityService() {
     }
 
     /**
+     * Pauses the active Instagram Reel video by dispatching an instant tap on the video player viewport.
+     */
+    private fun pauseActiveReelVideo() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            val metrics = resources.displayMetrics
+            val x = metrics.widthPixels / 2f
+            val y = metrics.heightPixels * 0.45f // center of the Reel video player
+
+            val path = Path().apply {
+                moveTo(x, y)
+            }
+            val stroke = GestureDescription.StrokeDescription(path, 0, 40)
+            val gesture = GestureDescription.Builder().addStroke(stroke).build()
+            dispatchGesture(gesture, null, null)
+            Log.d(TAG, "Dispatched tap gesture to pause active Reel video.")
+        }
+    }
+
+    /**
      * Shows the floating overlay window directly over Instagram (Truecaller style),
-     * pausing video/audio playback and completely blocking scrolling touches.
+     * pauses video and audio playback, and completely blocks scrolling touches.
      */
     fun showScrollingLock(reason: String) {
         val now = System.currentTimeMillis()
@@ -411,6 +431,9 @@ class InstagramReelsBlockerService : AccessibilityService() {
             return
         }
         lastBlockScreenTimestamp = now
+
+        // Immediately pause the active Reel video so it stops playing while the popup is visible
+        pauseActiveReelVideo()
 
         try {
             if (::overlayManager.isInitialized) {
@@ -435,8 +458,10 @@ class InstagramReelsBlockerService : AccessibilityService() {
     }
 
     private fun openInstagramDms() {
-        suppressBlockingUntil = System.currentTimeMillis() + 4000L
-        pendingNavigateToHome = true
+        // Set generous grace window (6 seconds) so DMs load without any interception
+        suppressBlockingUntil = System.currentTimeMillis() + 6000L
+        // CRITICAL FIX: Ensure pendingNavigateToHome is strictly FALSE so we NEVER auto-click Home when user asked for DMs!
+        pendingNavigateToHome = false
 
         try {
             val dmIntent = Intent(Intent.ACTION_VIEW, Uri.parse("instagram://direct-inbox")).apply {
@@ -444,6 +469,7 @@ class InstagramReelsBlockerService : AccessibilityService() {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK
             }
             startActivity(dmIntent)
+            Log.d(TAG, "Navigating cleanly to Instagram Direct Messages inbox.")
         } catch (e: Exception) {
             val launchIntent = packageManager.getLaunchIntentForPackage("com.instagram.android")?.apply {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
@@ -455,8 +481,8 @@ class InstagramReelsBlockerService : AccessibilityService() {
     }
 
     private fun openInstagramFeed() {
-        // Pause blocker for 5 seconds so user can browse posts on the Home feed without re-locking
         suppressBlockingUntil = System.currentTimeMillis() + 5000L
+        // Here pendingNavigateToHome is TRUE because the user specifically chose "Back to Feed"!
         pendingNavigateToHome = true
         try {
             val launchIntent = packageManager.getLaunchIntentForPackage("com.instagram.android")?.apply {

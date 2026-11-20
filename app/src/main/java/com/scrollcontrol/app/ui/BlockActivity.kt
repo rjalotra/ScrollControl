@@ -352,8 +352,8 @@ class BlockActivity : ComponentActivity() {
     }
 
     private fun openInstagramDms() {
-        InstagramReelsBlockerService.suppressBlockingUntil = System.currentTimeMillis() + 4000L
-        InstagramReelsBlockerService.pendingNavigateToHome = true
+        InstagramReelsBlockerService.suppressBlockingUntil = System.currentTimeMillis() + 6000L
+        InstagramReelsBlockerService.pendingNavigateToHome = false
 
         try {
             val dmIntent = Intent(Intent.ACTION_VIEW, Uri.parse("instagram://direct-inbox")).apply {
