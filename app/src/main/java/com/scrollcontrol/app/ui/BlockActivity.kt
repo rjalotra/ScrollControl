@@ -7,8 +7,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.animation.*
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -19,13 +17,12 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Chat
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.FormatQuote
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.PowerSettingsNew
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Send
-import androidx.compose.material.icons.filled.Shield
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -40,8 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.scrollcontrol.app.data.MotivationalQuotes
 import com.scrollcontrol.app.service.InstagramReelsBlockerService
-import com.scrollcontrol.app.ui.theme.PrimaryAccent
-import com.scrollcontrol.app.ui.theme.SecondaryAccent
+import com.scrollcontrol.app.ui.theme.*
 
 class BlockActivity : ComponentActivity() {
 
@@ -59,138 +55,144 @@ class BlockActivity : ComponentActivity() {
         val isDmScroll = blockReason == REASON_DM_SCROLL
 
         setContent {
-            // When user taps Back, safely return to Android Home screen rather than back to Reels
             BackHandler {
                 goToHomeScreen()
             }
 
             var currentQuote by remember { mutableStateOf(MotivationalQuotes.getRandomQuote()) }
 
-            // Full-screen dimmed backdrop that consumes all touches to block scrolling underneath
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color(0xD9090C12)) // ~85% dark frosted backdrop over Instagram
+                    .background(Color(0xD90A090E))
                     .clickable(
                         interactionSource = remember { MutableInteractionSource() },
                         indication = null,
-                        onClick = { /* Intercept touch so clicking outside does not dismiss or trigger reels */ }
+                        onClick = { /* Intercept outside touches */ }
                     )
-                    .padding(20.dp),
+                    .padding(horizontal = 20.dp, vertical = 24.dp),
                 contentAlignment = Alignment.Center
             ) {
-                // Centered Elevated Pop-up Card
                 Card(
                     shape = RoundedCornerShape(28.dp),
                     colors = CardDefaults.cardColors(
-                        containerColor = Color(0xFF161A22)
+                        containerColor = ZenCardSurface
                     ),
                     border = BorderStroke(
                         width = 1.dp,
                         brush = Brush.linearGradient(
                             listOf(
-                                PrimaryAccent.copy(alpha = 0.6f),
+                                SakuraPink.copy(alpha = 0.7f),
                                 SecondaryAccent.copy(alpha = 0.4f),
                                 Color(0x22FFFFFF)
                             )
                         )
                     ),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 16.dp),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 20.dp),
                     modifier = Modifier
-                        .fillMaxWidth()
+                        .fillMaxWidth(0.92f)
                         .wrapContentHeight()
-                        .padding(horizontal = 4.dp)
                 ) {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         modifier = Modifier
                             .fillMaxWidth()
                             .verticalScroll(rememberScrollState())
-                            .padding(24.dp)
+                            .padding(22.dp)
                     ) {
-                        // Header Status Pill
-                        Surface(
-                            shape = RoundedCornerShape(50),
-                            color = Color(0xFF262626),
-                            border = BorderStroke(1.dp, PrimaryAccent.copy(alpha = 0.5f)),
-                            modifier = Modifier.padding(bottom = 16.dp)
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(6.dp),
-                                modifier = Modifier.padding(horizontal = 14.dp, vertical = 6.dp)
+                            Surface(
+                                shape = RoundedCornerShape(50),
+                                color = Color(0xFF251F2A),
+                                border = BorderStroke(1.dp, SakuraPink.copy(alpha = 0.4f))
                             ) {
-                                Box(
-                                    modifier = Modifier
-                                        .size(8.dp)
-                                        .clip(CircleShape)
-                                        .background(PrimaryAccent)
-                                )
-                                Text(
-                                    text = if (isDmScroll) "DM Reel Scrolling Locked" else "Reels Scrolling Locked",
-                                    fontSize = 12.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color(0xFFFFA6C9),
-                                    letterSpacing = 0.5.sp
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 5.dp)
+                                ) {
+                                    SinglePetal(tint = SakuraPink, modifier = Modifier.size(10.dp))
+                                    Text(
+                                        text = if (isDmScroll) "DM Reel Scroll Locked" else "Reels Scrolling Locked",
+                                        fontSize = 11.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = SakuraSoft,
+                                        letterSpacing = 0.4.sp
+                                    )
+                                }
+                            }
+
+                            IconButton(
+                                onClick = { goToHomeScreen() },
+                                modifier = Modifier.size(28.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Close,
+                                    contentDescription = "Close",
+                                    tint = ZenMutedText,
+                                    modifier = Modifier.size(18.dp)
                                 )
                             }
                         }
 
-                        // Icon Container
+                        Spacer(modifier = Modifier.height(12.dp))
+
                         Box(
                             modifier = Modifier
-                                .size(64.dp)
+                                .size(68.dp)
                                 .clip(CircleShape)
                                 .background(
-                                    Brush.linearGradient(
-                                        listOf(PrimaryAccent.copy(alpha = 0.25f), SecondaryAccent.copy(alpha = 0.15f))
+                                    Brush.radialGradient(
+                                        listOf(SakuraPink.copy(alpha = 0.25f), Color.Transparent)
                                     )
                                 ),
                             contentAlignment = Alignment.Center
                         ) {
-                            Icon(
-                                imageVector = if (isDmScroll) Icons.Default.Chat else Icons.Default.Shield,
-                                contentDescription = "Blocked",
-                                tint = PrimaryAccent,
-                                modifier = Modifier.size(32.dp)
+                            SakuraFlower(
+                                modifier = Modifier.size(54.dp),
+                                petalGradient = listOf(Color(0xFFFF9EB5), Color(0xFFFF4D74)),
+                                stamenColor = GoldAccent
                             )
                         }
 
-                        Spacer(modifier = Modifier.height(14.dp))
+                        Spacer(modifier = Modifier.height(10.dp))
 
-                        // Modal Title
                         Text(
-                            text = if (isDmScroll) "Back to Your Chat" else "Pause & Reflect",
-                            fontSize = 24.sp,
+                            text = if (isDmScroll) "Return to Chat" else "Mindful Pause",
+                            fontSize = 22.sp,
                             fontWeight = FontWeight.ExtraBold,
                             color = Color.White,
                             textAlign = TextAlign.Center
                         )
 
-                        Spacer(modifier = Modifier.height(4.dp))
+                        Spacer(modifier = Modifier.height(3.dp))
 
                         Text(
                             text = if (isDmScroll)
-                                "You watched the shared clip and started scrolling more reels. Head back to your conversation!"
+                                "You watched the clip and started scrolling. Keep the real conversation going!"
                             else
-                                "Reels tab engagement was detected. Take a breath instead of doomscrolling.",
-                            fontSize = 13.sp,
-                            color = Color(0xFFA0A6B2),
+                                "Take a deep breath. Cherish your focus and step out of the endless feed.",
+                            fontSize = 12.sp,
+                            color = ZenMutedText,
                             textAlign = TextAlign.Center,
-                            modifier = Modifier.padding(horizontal = 8.dp)
+                            modifier = Modifier.padding(horizontal = 8.dp),
+                            lineHeight = 17.sp
                         )
 
-                        Spacer(modifier = Modifier.height(20.dp))
+                        Spacer(modifier = Modifier.height(16.dp))
 
-                        // Motivational Quote Box
                         Surface(
-                            shape = RoundedCornerShape(20.dp),
-                            color = Color(0xFF0F1218),
-                            border = BorderStroke(1.dp, Color(0xFF242A36)),
+                            shape = RoundedCornerShape(16.dp),
+                            color = Color(0xFF100E14),
+                            border = BorderStroke(1.dp, Color(0x1FFFFFFF)),
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             Column(
-                                modifier = Modifier.padding(18.dp)
+                                modifier = Modifier.padding(14.dp)
                             ) {
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
@@ -199,34 +201,32 @@ class BlockActivity : ComponentActivity() {
                                 ) {
                                     Surface(
                                         shape = RoundedCornerShape(6.dp),
-                                        color = SecondaryAccent.copy(alpha = 0.2f)
+                                        color = SakuraPink.copy(alpha = 0.15f)
                                     ) {
                                         Text(
                                             text = currentQuote.category.uppercase(),
-                                            fontSize = 10.sp,
+                                            fontSize = 9.sp,
                                             fontWeight = FontWeight.ExtraBold,
-                                            color = Color(0xFFD4B0FF),
-                                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp),
-                                            letterSpacing = 0.5.sp
+                                            color = SakuraSoft,
+                                            modifier = Modifier.padding(horizontal = 7.dp, vertical = 2.dp),
+                                            letterSpacing = 0.4.sp
                                         )
                                     }
 
                                     IconButton(
-                                        onClick = {
-                                            currentQuote = MotivationalQuotes.getRandomQuote()
-                                        },
-                                        modifier = Modifier.size(28.dp)
+                                        onClick = { currentQuote = MotivationalQuotes.getRandomQuote() },
+                                        modifier = Modifier.size(24.dp)
                                     ) {
                                         Icon(
                                             imageVector = Icons.Default.Refresh,
                                             contentDescription = "New Quote",
-                                            tint = Color(0xFF8B949E),
-                                            modifier = Modifier.size(18.dp)
+                                            tint = SakuraPink,
+                                            modifier = Modifier.size(16.dp)
                                         )
                                     }
                                 }
 
-                                Spacer(modifier = Modifier.height(10.dp))
+                                Spacer(modifier = Modifier.height(8.dp))
 
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
@@ -235,115 +235,112 @@ class BlockActivity : ComponentActivity() {
                                     Icon(
                                         imageVector = Icons.Default.FormatQuote,
                                         contentDescription = null,
-                                        tint = PrimaryAccent.copy(alpha = 0.8f),
+                                        tint = SakuraPink.copy(alpha = 0.8f),
                                         modifier = Modifier
-                                            .size(24.dp)
+                                            .size(20.dp)
                                             .padding(top = 2.dp)
                                     )
-                                    Spacer(modifier = Modifier.width(6.dp))
+                                    Spacer(modifier = Modifier.width(4.dp))
                                     Text(
                                         text = currentQuote.quote,
-                                        fontSize = 15.sp,
+                                        fontSize = 13.sp,
                                         fontStyle = FontStyle.Italic,
                                         fontWeight = FontWeight.Medium,
-                                        color = Color(0xFFE6EDF3),
-                                        lineHeight = 22.sp
+                                        color = Color(0xFFF3EDF7),
+                                        lineHeight = 19.sp
                                     )
                                 }
 
-                                Spacer(modifier = Modifier.height(10.dp))
+                                Spacer(modifier = Modifier.height(6.dp))
 
                                 Text(
                                     text = "— ${currentQuote.author}",
-                                    fontSize = 13.sp,
+                                    fontSize = 11.sp,
                                     fontWeight = FontWeight.Bold,
-                                    color = Color(0xFF9CA3AF),
+                                    color = SakuraSoft,
                                     textAlign = TextAlign.End,
                                     modifier = Modifier.fillMaxWidth()
                                 )
                             }
                         }
 
-                        Spacer(modifier = Modifier.height(24.dp))
+                        Spacer(modifier = Modifier.height(18.dp))
 
-                        // Action 1: Back to DMs / Chat (Primary Action)
                         Button(
                             onClick = { openInstagramDms() },
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = PrimaryAccent
+                                containerColor = SakuraDeep
                             ),
-                            shape = RoundedCornerShape(14.dp),
+                            shape = RoundedCornerShape(12.dp),
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(50.dp)
+                                .height(46.dp)
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Send,
                                 contentDescription = null,
                                 tint = Color.White,
-                                modifier = Modifier.size(18.dp)
+                                modifier = Modifier.size(16.dp)
                             )
-                            Spacer(modifier = Modifier.width(8.dp))
+                            Spacer(modifier = Modifier.width(6.dp))
                             Text(
                                 text = if (isDmScroll) "Return to Chat" else "Back to DMs",
-                                fontSize = 15.sp,
+                                fontSize = 14.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = Color.White
                             )
                         }
 
-                        Spacer(modifier = Modifier.height(10.dp))
+                        Spacer(modifier = Modifier.height(8.dp))
 
-                        // Action 2: Back to Home Feed
                         Button(
                             onClick = { openInstagramFeed() },
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = Color(0xFF262626)
+                                containerColor = Color(0xFF231F2A)
                             ),
-                            shape = RoundedCornerShape(14.dp),
+                            shape = RoundedCornerShape(12.dp),
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(50.dp)
+                                .height(44.dp)
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Home,
                                 contentDescription = null,
                                 tint = Color.White,
-                                modifier = Modifier.size(18.dp)
+                                modifier = Modifier.size(16.dp)
                             )
-                            Spacer(modifier = Modifier.width(8.dp))
+                            Spacer(modifier = Modifier.width(6.dp))
                             Text(
                                 text = "Back to Feed",
-                                fontSize = 15.sp,
+                                fontSize = 14.sp,
                                 fontWeight = FontWeight.SemiBold,
                                 color = Color.White
                             )
                         }
 
-                        Spacer(modifier = Modifier.height(10.dp))
+                        Spacer(modifier = Modifier.height(8.dp))
 
-                        // Action 3: Exit Instagram
                         OutlinedButton(
                             onClick = { goToHomeScreen() },
-                            shape = RoundedCornerShape(14.dp),
-                            border = BorderStroke(1.dp, Color(0xFF333B4A)),
+                            shape = RoundedCornerShape(12.dp),
+                            border = BorderStroke(1.dp, Color(0xFF332E3C)),
                             colors = ButtonDefaults.outlinedButtonColors(
                                 contentColor = Color(0xFFCBD5E1)
                             ),
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(50.dp)
+                                .height(44.dp)
                         ) {
                             Icon(
                                 imageVector = Icons.Default.PowerSettingsNew,
                                 contentDescription = null,
                                 tint = Color(0xFFCBD5E1),
-                                modifier = Modifier.size(18.dp)
+                                modifier = Modifier.size(16.dp)
                             )
-                            Spacer(modifier = Modifier.width(8.dp))
+                            Spacer(modifier = Modifier.width(6.dp))
                             Text(
                                 text = "Exit Instagram",
-                                fontSize = 14.sp,
+                                fontSize = 13.sp,
                                 fontWeight = FontWeight.Medium,
                                 color = Color(0xFFCBD5E1)
                             )
@@ -376,7 +373,6 @@ class BlockActivity : ComponentActivity() {
     }
 
     private fun openInstagramFeed() {
-        // Pause blocker for 5 seconds so user can browse posts on the Home feed without re-locking
         InstagramReelsBlockerService.suppressBlockingUntil = System.currentTimeMillis() + 5000L
         InstagramReelsBlockerService.pendingNavigateToHome = true
         try {

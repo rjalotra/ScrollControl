@@ -22,6 +22,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
@@ -36,9 +37,7 @@ import com.scrollcontrol.app.ScrollControlApp
 import com.scrollcontrol.app.data.BlockerSettings
 import com.scrollcontrol.app.data.MotivationalQuotes
 import com.scrollcontrol.app.service.InstagramReelsBlockerService
-import com.scrollcontrol.app.ui.theme.EmeraldActive
-import com.scrollcontrol.app.ui.theme.PrimaryAccent
-import com.scrollcontrol.app.ui.theme.SecondaryAccent
+import com.scrollcontrol.app.ui.theme.*
 import kotlinx.coroutines.launch
 
 @Composable
@@ -70,32 +69,67 @@ fun DashboardScreen(modifier: Modifier = Modifier) {
     Column(
         modifier = modifier
             .fillMaxSize()
+            .background(ZenDarkBackground)
             .verticalScroll(scrollState)
-            .padding(16.dp),
+            .padding(horizontal = 18.dp, vertical = 14.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        // App Title & Tagline
-        Column {
-            Text(
-                text = "ScrollControl",
-                style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.ExtraBold,
-                color = MaterialTheme.colorScheme.primary
-            )
-            Text(
-                text = "Truecaller-style floating blocker for Instagram Reels",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+        // Japanese Floral Minimalist Header
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 8.dp, bottom = 4.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Text(
+                        text = "ScrollControl",
+                        fontSize = 26.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = Color.White,
+                        letterSpacing = (-0.5).sp
+                    )
+                    Surface(
+                        shape = RoundedCornerShape(12.dp),
+                        color = SakuraPink.copy(alpha = 0.15f),
+                        border = BorderStroke(1.dp, SakuraPink.copy(alpha = 0.35f))
+                    ) {
+                        Text(
+                            text = "桜 ZEN",
+                            fontSize = 10.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = SakuraPink,
+                            modifier = Modifier.padding(horizontal = 7.dp, vertical = 2.dp)
+                        )
+                    }
+                }
+                Spacer(modifier = Modifier.height(2.dp))
+                Text(
+                    text = "Mindful Instagram protection & calm focus",
+                    fontSize = 13.sp,
+                    color = ZenMutedText
+                )
+            }
+
+            // Close-up Japanese Sakura Blossom
+            SakuraFlower(
+                modifier = Modifier.size(46.dp)
             )
         }
 
-        // Permission Card (Only shown if permission is missing)
+        // Accessibility Permission Notice (if needed)
         if (!isAccessibilityEnabled) {
             Card(
                 colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.errorContainer
+                    containerColor = Color(0xFF2D161C)
                 ),
-                shape = RoundedCornerShape(16.dp),
+                border = BorderStroke(1.dp, SakuraDeep.copy(alpha = 0.4f)),
+                shape = RoundedCornerShape(20.dp),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Column(
@@ -106,21 +140,19 @@ fun DashboardScreen(modifier: Modifier = Modifier) {
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        Icon(
-                            imageVector = Icons.Default.Warning,
-                            contentDescription = "Warning",
-                            tint = MaterialTheme.colorScheme.error
-                        )
+                        SinglePetal(tint = SakuraDeep)
                         Text(
                             text = "Accessibility Permission Required",
                             fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onErrorContainer
+                            fontSize = 14.sp,
+                            color = Color(0xFFFFCCD5)
                         )
                     }
                     Text(
                         text = "To detect the Reels pill and 'Send to chat' buttons and display the floating blocker overlay, ScrollControl requires Accessibility permission.",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onErrorContainer
+                        fontSize = 12.sp,
+                        color = Color(0xFFE2B6C0),
+                        lineHeight = 17.sp
                     )
                     Button(
                         onClick = {
@@ -130,21 +162,33 @@ fun DashboardScreen(modifier: Modifier = Modifier) {
                             context.startActivity(intent)
                         },
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.error
+                            containerColor = SakuraDeep
                         ),
+                        shape = RoundedCornerShape(10.dp),
                         modifier = Modifier.align(Alignment.End)
                     ) {
-                        Text("Enable in Settings")
+                        Text("Enable in Settings", fontSize = 12.sp)
                     }
                 }
             }
         }
 
-        // Master Blocker Status Card
+        // ==========================================
+        // 1. MAIN OPTION AT THE VERY TOP
+        // ==========================================
         Card(
-            shape = RoundedCornerShape(20.dp),
+            shape = RoundedCornerShape(24.dp),
             colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surfaceVariant
+                containerColor = ZenCardSurface
+            ),
+            border = BorderStroke(
+                width = 1.dp,
+                brush = Brush.linearGradient(
+                    listOf(
+                        if (settings.isBlockerEnabled && isAccessibilityEnabled) SakuraPink.copy(alpha = 0.6f) else Color(0x22FFFFFF),
+                        Color(0x11FFFFFF)
+                    )
+                )
             ),
             modifier = Modifier.fillMaxWidth()
         ) {
@@ -155,61 +199,190 @@ fun DashboardScreen(modifier: Modifier = Modifier) {
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(14.dp),
+                    modifier = Modifier.weight(1f)
+                ) {
+                    // Visual state icon with glowing sakura or soft slate
+                    Box(
+                        modifier = Modifier
+                            .size(48.dp)
+                            .clip(CircleShape)
+                            .background(
+                                if (settings.isBlockerEnabled && isAccessibilityEnabled)
+                                    Brush.radialGradient(listOf(SakuraPink.copy(alpha = 0.3f), Color.Transparent))
+                                else
+                                    Color(0xFF23202A)
+                            ),
+                        contentAlignment = Alignment.Center
                     ) {
-                        Box(
-                            modifier = Modifier
-                                .size(10.dp)
-                                .clip(CircleShape)
-                                .background(
-                                    if (settings.isBlockerEnabled && isAccessibilityEnabled) EmeraldActive
-                                    else Color.Gray
-                                )
-                        )
-                        Text(
-                            text = if (settings.isBlockerEnabled && isAccessibilityEnabled) "Floating Blocker Active"
-                            else if (!isAccessibilityEnabled) "Waiting for Permission"
-                            else "Blocker Paused",
-                            fontWeight = FontWeight.SemiBold,
-                            fontSize = 18.sp
+                        SakuraFlower(
+                            modifier = Modifier.size(34.dp),
+                            petalGradient = if (settings.isBlockerEnabled && isAccessibilityEnabled)
+                                listOf(Color(0xFFFF94AF), Color(0xFFFF5277))
+                            else
+                                listOf(Color(0xFF706B78), Color(0xFF4C4753)),
+                            stamenColor = if (settings.isBlockerEnabled && isAccessibilityEnabled) GoldAccent else Color.Gray
                         )
                     }
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = if (settings.isBlockerEnabled) "Monitoring Reels tab & DM scrolling with floating overlay" else "Interception is temporarily paused",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+
+                    Column {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(6.dp)
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .size(8.dp)
+                                    .clip(CircleShape)
+                                    .background(
+                                        if (settings.isBlockerEnabled && isAccessibilityEnabled) ZenActiveGreen
+                                        else if (!isAccessibilityEnabled) GoldAccent
+                                        else Color.Gray
+                                    )
+                            )
+                            Text(
+                                text = if (settings.isBlockerEnabled && isAccessibilityEnabled) "Protection Active"
+                                else if (!isAccessibilityEnabled) "Awaiting Permission"
+                                else "Protection Paused",
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 16.sp,
+                                color = Color.White
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(2.dp))
+                        Text(
+                            text = if (settings.isBlockerEnabled) "Monitoring Reels tab & DM scrolling" else "Interception temporarily off",
+                            fontSize = 12.sp,
+                            color = ZenMutedText
+                        )
+                    }
                 }
 
                 Switch(
                     checked = settings.isBlockerEnabled,
                     onCheckedChange = { enabled ->
                         scope.launch { repo.setBlockerEnabled(enabled) }
-                    }
+                    },
+                    colors = SwitchDefaults.colors(
+                        checkedThumbColor = Color.White,
+                        checkedTrackColor = SakuraPink,
+                        uncheckedThumbColor = Color.Gray,
+                        uncheckedTrackColor = Color(0xFF2C2834)
+                    )
                 )
             }
         }
 
-        // Stats Card
+        // ==========================================
+        // 2. REST OF OPTIONS GROUPED TOGETHER BELOW MAIN
+        // ==========================================
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(6.dp)
+            ) {
+                SinglePetal(tint = SakuraPink, modifier = Modifier.size(14.dp))
+                Text(
+                    text = "Protection Rules",
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
+            }
+
+            // Grouped Options Container Card
+            Card(
+                shape = RoundedCornerShape(22.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = ZenCardSurface
+                ),
+                border = BorderStroke(1.dp, Color(0x1AFFFFFF)),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(modifier = Modifier.padding(vertical = 4.dp)) {
+                    // Option 1: DM Reel Scroll Blocker
+                    RuleRowItem(
+                        title = "Block Reels Scrolling in DMs",
+                        description = "Catches the 'Send to chat' pill and stops scrolling beyond a shared clip",
+                        icon = Icons.Outlined.Chat,
+                        checked = settings.blockNextReelScrollInDm,
+                        onCheckedChange = { scope.launch { repo.setBlockNextReelScrollInDm(it) } }
+                    )
+
+                    HorizontalDivider(
+                        color = Color(0x12FFFFFF),
+                        modifier = Modifier.padding(horizontal = 16.dp)
+                    )
+
+                    // Option 2: Allow Single Reel in DMs
+                    RuleRowItem(
+                        title = "Allow Single Reel in DMs",
+                        description = "Permits watching the single video a friend shared without locking",
+                        icon = Icons.Outlined.PlayCircle,
+                        checked = settings.allowReelsInDm,
+                        onCheckedChange = { scope.launch { repo.setAllowReelsInDm(it) } }
+                    )
+
+                    HorizontalDivider(
+                        color = Color(0x12FFFFFF),
+                        modifier = Modifier.padding(horizontal = 16.dp)
+                    )
+
+                    // Option 3: Block FYP Feed
+                    RuleRowItem(
+                        title = "Block FYP Feed (Direct-Only)",
+                        description = "Keeps you in your Direct Messages and redirects away from Home feed",
+                        icon = Icons.Outlined.Home,
+                        checked = settings.blockHomeFeed,
+                        onCheckedChange = { scope.launch { repo.setBlockHomeFeed(it) } }
+                    )
+
+                    HorizontalDivider(
+                        color = Color(0x12FFFFFF),
+                        modifier = Modifier.padding(horizontal = 16.dp)
+                    )
+
+                    // Option 4: Block Explore Grid
+                    RuleRowItem(
+                        title = "Block Explore / Search Grid",
+                        description = "Prevents browsing the algorithmic explore grid",
+                        icon = Icons.Outlined.Explore,
+                        checked = settings.blockExploreTab,
+                        onCheckedChange = { scope.launch { repo.setBlockExploreTab(it) } }
+                    )
+                }
+            }
+        }
+
+        // ==========================================
+        // 3. REST OF THE DETAILS BELOW THE OPTIONS
+        // ==========================================
+
+        // Focus Impact Stats
         Card(
-            shape = RoundedCornerShape(20.dp),
+            shape = RoundedCornerShape(22.dp),
             colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surface
+                containerColor = ZenCardSurface
             ),
-            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+            border = BorderStroke(1.dp, Color(0x15FFFFFF)),
             modifier = Modifier.fillMaxWidth()
         ) {
-            Column(modifier = Modifier.padding(20.dp)) {
-                Text(
-                    text = "Focus Impact",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
-                )
-                Spacer(modifier = Modifier.height(16.dp))
+            Column(modifier = Modifier.padding(18.dp)) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    Text(
+                        text = "Focus Impact",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
+                    )
+                }
+                Spacer(modifier = Modifier.height(14.dp))
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceEvenly
@@ -221,8 +394,9 @@ fun DashboardScreen(modifier: Modifier = Modifier) {
                     )
                     VerticalDivider(
                         modifier = Modifier
-                            .height(40.dp)
-                            .width(1.dp)
+                            .height(38.dp)
+                            .width(1.dp),
+                        color = Color(0x1FFFFFFF)
                     )
                     StatItem(
                         icon = Icons.Outlined.Timer,
@@ -233,16 +407,16 @@ fun DashboardScreen(modifier: Modifier = Modifier) {
             }
         }
 
-        // Motivational Quote Pop-up Preview Card
+        // Floating Overlay Window Preview Card with Sakura Theme
         Card(
-            shape = RoundedCornerShape(20.dp),
+            shape = RoundedCornerShape(22.dp),
             colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surface
+                containerColor = ZenCardSurface
             ),
-            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+            border = BorderStroke(1.dp, SakuraPink.copy(alpha = 0.25f)),
             modifier = Modifier.fillMaxWidth()
         ) {
-            Column(modifier = Modifier.padding(20.dp)) {
+            Column(modifier = Modifier.padding(18.dp)) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -252,28 +426,24 @@ fun DashboardScreen(modifier: Modifier = Modifier) {
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        Icon(
-                            imageVector = Icons.Default.FormatQuote,
-                            contentDescription = null,
-                            tint = PrimaryAccent,
-                            modifier = Modifier.size(20.dp)
-                        )
+                        SinglePetal(tint = SakuraPink, modifier = Modifier.size(16.dp))
                         Text(
-                            text = "Floating Overlay Preview",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold
+                            text = "Motivational Quote Preview",
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White
                         )
                     }
 
                     IconButton(
                         onClick = { previewQuote = MotivationalQuotes.getRandomQuote() },
-                        modifier = Modifier.size(32.dp)
+                        modifier = Modifier.size(30.dp)
                     ) {
                         Icon(
                             imageVector = Icons.Default.Refresh,
                             contentDescription = "Shuffle",
-                            tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(18.dp)
+                            tint = SakuraPink,
+                            modifier = Modifier.size(16.dp)
                         )
                     }
                 }
@@ -282,22 +452,24 @@ fun DashboardScreen(modifier: Modifier = Modifier) {
 
                 Surface(
                     shape = RoundedCornerShape(14.dp),
-                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                    color = Color(0xFF100E14),
+                    border = BorderStroke(1.dp, Color(0x1FFFFFFF)),
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Column(modifier = Modifier.padding(14.dp)) {
                         Text(
                             text = "“${previewQuote.quote}”",
-                            fontSize = 14.sp,
+                            fontSize = 13.sp,
                             fontStyle = FontStyle.Italic,
-                            color = MaterialTheme.colorScheme.onSurface
+                            color = Color(0xFFF0EBF5),
+                            lineHeight = 19.sp
                         )
                         Spacer(modifier = Modifier.height(6.dp))
                         Text(
                             text = "— ${previewQuote.author} (${previewQuote.category})",
-                            fontSize = 12.sp,
+                            fontSize = 11.sp,
                             fontWeight = FontWeight.SemiBold,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = SakuraSoft
                         )
                     }
                 }
@@ -322,9 +494,11 @@ fun DashboardScreen(modifier: Modifier = Modifier) {
                             }
                         },
                         shape = RoundedCornerShape(12.dp),
+                        border = BorderStroke(1.dp, SakuraPink.copy(alpha = 0.4f)),
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = SakuraSoft),
                         modifier = Modifier.weight(1f)
                     ) {
-                        Text("Test Reels Tab", fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+                        Text("Test Reels Tab", fontSize = 11.sp, fontWeight = FontWeight.SemiBold)
                     }
 
                     OutlinedButton(
@@ -341,52 +515,15 @@ fun DashboardScreen(modifier: Modifier = Modifier) {
                             }
                         },
                         shape = RoundedCornerShape(12.dp),
+                        border = BorderStroke(1.dp, SecondaryAccent.copy(alpha = 0.4f)),
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFFE2B6FF)),
                         modifier = Modifier.weight(1f)
                     ) {
-                        Text("Test DM Scroll", fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+                        Text("Test DM Scroll", fontSize = 11.sp, fontWeight = FontWeight.SemiBold)
                     }
                 }
             }
         }
-
-        // Feature Protection Rules
-        Text(
-            text = "Protection Rules",
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Bold
-        )
-
-        RuleToggleCard(
-            title = "Block Reels Scrolling in DMs",
-            description = "Detects the 'Send to chat' button and displays the floating window to block scrolling beyond a friend's shared video",
-            icon = Icons.Outlined.Chat,
-            checked = settings.blockNextReelScrollInDm,
-            onCheckedChange = { scope.launch { repo.setBlockNextReelScrollInDm(it) } }
-        )
-
-        RuleToggleCard(
-            title = "Allow Single Reel in DMs",
-            description = "Lets you watch the specific clip your friend sent without triggering the blocker",
-            icon = Icons.Outlined.PlayCircle,
-            checked = settings.allowReelsInDm,
-            onCheckedChange = { scope.launch { repo.setAllowReelsInDm(it) } }
-        )
-
-        RuleToggleCard(
-            title = "Block FYP Feed (Direct-Only Mode)",
-            description = "Keeps you in your Direct Messages and redirects away from the Home feed",
-            icon = Icons.Outlined.Home,
-            checked = settings.blockHomeFeed,
-            onCheckedChange = { scope.launch { repo.setBlockHomeFeed(it) } }
-        )
-
-        RuleToggleCard(
-            title = "Block Explore / Search Grid",
-            description = "Prevents browsing the algorithmic explore page",
-            icon = Icons.Outlined.Explore,
-            checked = settings.blockExploreTab,
-            onCheckedChange = { scope.launch { repo.setBlockExploreTab(it) } }
-        )
 
         // Quick Direct Launch Action
         Button(
@@ -406,54 +543,46 @@ fun DashboardScreen(modifier: Modifier = Modifier) {
             },
             shape = RoundedCornerShape(16.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.primary
+                containerColor = SakuraDeep
             ),
             modifier = Modifier
                 .fillMaxWidth()
-                .height(54.dp)
+                .height(52.dp)
         ) {
-            Icon(imageVector = Icons.Default.Send, contentDescription = "DMs")
+            Icon(imageVector = Icons.Default.Send, contentDescription = "DMs", tint = Color.White)
             Spacer(modifier = Modifier.width(8.dp))
             Text(
                 text = "Open Instagram DMs Directly",
                 fontWeight = FontWeight.Bold,
-                fontSize = 15.sp
+                fontSize = 15.sp,
+                color = Color.White
             )
         }
 
-        // Detection Technical Info Card
+        // Technical How It Works Details Card
         Card(
-            shape = RoundedCornerShape(16.dp),
+            shape = RoundedCornerShape(18.dp),
             colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)
+                containerColor = ZenCardSurface.copy(alpha = 0.7f)
             ),
+            border = BorderStroke(1.dp, Color(0x10FFFFFF)),
             modifier = Modifier.fillMaxWidth()
         ) {
             Column(
                 modifier = Modifier.padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                verticalArrangement = Arrangement.spacedBy(6.dp)
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Outlined.Info,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(20.dp)
-                    )
-                    Text(
-                        text = "How the Floating Overlay Works",
-                        fontWeight = FontWeight.Bold,
-                        style = MaterialTheme.typography.titleSmall
-                    )
-                }
                 Text(
-                    text = "• Truecaller-style Window: Instead of switching tasks or launching the ScrollControl app, an overlay window floats directly above Instagram.\n• Touch Blocking: The overlay absorbs all touch gestures, making vertical scrolling impossible.\n• Redirects: Tapping 'Return to Chat' or 'Back to Feed' automatically navigates you away from Reels and dismisses the window.",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    lineHeight = 18.sp
+                    text = "How ScrollControl Operates",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 13.sp,
+                    color = Color.White
+                )
+                Text(
+                    text = "• Reels Tab Pill: Catches the active rounded capsule behind the Reels icon in the bottom bar.\n• DM Reel Scrolling: Intercepts the floating 'Send to chat' pill with your friend's avatar the moment you scroll past a shared video.\n• Floating Overlay: Appears directly over Instagram, mutes/pauses the video via audio focus, and captures touch to block scrolling.",
+                    fontSize = 12.sp,
+                    color = ZenMutedText,
+                    lineHeight = 17.sp
                 )
             }
         }
@@ -464,9 +593,67 @@ fun DashboardScreen(modifier: Modifier = Modifier) {
                 onClick = { scope.launch { repo.resetStats() } },
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             ) {
-                Text("Reset Blocked Stats", color = MaterialTheme.colorScheme.outline)
+                Text("Reset Blocked Stats", color = ZenMutedText, fontSize = 12.sp)
             }
         }
+    }
+}
+
+@Composable
+private fun RuleRowItem(
+    title: String,
+    description: String,
+    icon: ImageVector,
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Row(
+            modifier = Modifier.weight(1f),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = if (checked) SakuraPink else Color.Gray,
+                modifier = Modifier.size(20.dp)
+            )
+            Column {
+                Text(
+                    text = title,
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 14.sp,
+                    color = Color.White
+                )
+                Spacer(modifier = Modifier.height(2.dp))
+                Text(
+                    text = description,
+                    fontSize = 11.sp,
+                    color = ZenMutedText,
+                    lineHeight = 15.sp
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.width(8.dp))
+
+        Switch(
+            checked = checked,
+            onCheckedChange = onCheckedChange,
+            colors = SwitchDefaults.colors(
+                checkedThumbColor = Color.White,
+                checkedTrackColor = SakuraPink,
+                uncheckedThumbColor = Color.Gray,
+                uncheckedTrackColor = Color(0xFF2C2834)
+            )
+        )
     }
 }
 
@@ -477,84 +664,23 @@ private fun StatItem(icon: ImageVector, value: String, label: String) {
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(18.dp)
+                tint = SakuraPink,
+                modifier = Modifier.size(16.dp)
             )
             Spacer(modifier = Modifier.width(6.dp))
             Text(
                 text = value,
-                fontSize = 22.sp,
+                fontSize = 20.sp,
                 fontWeight = FontWeight.ExtraBold,
-                color = MaterialTheme.colorScheme.onSurface
+                color = Color.White
             )
         }
-        Spacer(modifier = Modifier.height(4.dp))
+        Spacer(modifier = Modifier.height(2.dp))
         Text(
             text = label,
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            fontSize = 11.sp,
+            color = ZenMutedText
         )
-    }
-}
-
-@Composable
-private fun RuleToggleCard(
-    title: String,
-    description: String,
-    icon: ImageVector,
-    checked: Boolean,
-    enabled: Boolean = true,
-    onCheckedChange: (Boolean) -> Unit
-) {
-    Card(
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Row(
-                modifier = Modifier.weight(1f),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = null,
-                    tint = if (enabled) MaterialTheme.colorScheme.primary else Color.Gray,
-                    modifier = Modifier.size(24.dp)
-                )
-                Column {
-                    Text(
-                        text = title,
-                        fontWeight = FontWeight.SemiBold,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = if (enabled) MaterialTheme.colorScheme.onSurface else Color.Gray
-                    )
-                    Spacer(modifier = Modifier.height(2.dp))
-                    Text(
-                        text = description,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.width(8.dp))
-
-            Switch(
-                checked = checked,
-                enabled = enabled,
-                onCheckedChange = onCheckedChange
-            )
-        }
     }
 }
 

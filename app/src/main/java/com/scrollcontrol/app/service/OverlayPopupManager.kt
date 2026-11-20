@@ -20,14 +20,12 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Chat
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.FormatQuote
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.PowerSettingsNew
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Send
-import androidx.compose.material.icons.filled.Shield
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -49,8 +47,7 @@ import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import com.scrollcontrol.app.data.MotivationalQuotes
 import com.scrollcontrol.app.ui.BlockActivity
-import com.scrollcontrol.app.ui.theme.PrimaryAccent
-import com.scrollcontrol.app.ui.theme.SecondaryAccent
+import com.scrollcontrol.app.ui.theme.*
 
 /**
  * Custom LifecycleOwner required to host Jetpack Compose within a WindowManager Overlay Service.
@@ -80,11 +77,8 @@ class OverlayLifecycleOwner : SavedStateRegistryOwner, ViewModelStoreOwner {
 }
 
 /**
- * Truecaller-style floating overlay window manager that draws directly on top of Instagram
- * without launching the ScrollControl application or switching tasks.
- *
- * It intercepts all touch events to block scrolling, and requests audio focus to
- * immediately pause Instagram's reel video and audio playback.
+ * Truecaller-style floating overlay window manager decorated with a positive,
+ * minimalist Japanese floral (Sakura) theme that draws directly on top of Instagram.
  */
 class OverlayPopupManager(private val context: Context) {
 
@@ -108,9 +102,8 @@ class OverlayPopupManager(private val context: Context) {
         onGoToFeed: () -> Unit,
         onGoHome: () -> Unit
     ) {
-        if (isShowing) return // Already showing, prevent duplicate triggers and flashing
+        if (isShowing) return // Already showing
 
-        // Pause Instagram reel video and audio immediately via audio focus
         pauseInstagramPlayback()
 
         val isDmScroll = reason == BlockActivity.REASON_DM_SCROLL
@@ -122,8 +115,6 @@ class OverlayPopupManager(private val context: Context) {
             WindowManager.LayoutParams.TYPE_SYSTEM_ALERT
         }
 
-        // Window parameters: Modal window with hardware dimming.
-        // Captures ALL touch gestures so scrolling Instagram is physically blocked.
         val params = WindowManager.LayoutParams(
             WindowManager.LayoutParams.MATCH_PARENT,
             WindowManager.LayoutParams.MATCH_PARENT,
@@ -156,24 +147,24 @@ class OverlayPopupManager(private val context: Context) {
                         .clickable(
                             interactionSource = remember { MutableInteractionSource() },
                             indication = null,
-                            onClick = { /* Intercept all touches outside the card so reels cannot be scrolled */ }
+                            onClick = { /* Intercept outside touches */ }
                         )
                         .padding(horizontal = 20.dp, vertical = 24.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    // Truecaller-style compact floating card
+                    // Minimalist Japanese Floral Floating Card
                     Card(
-                        shape = RoundedCornerShape(26.dp),
+                        shape = RoundedCornerShape(28.dp),
                         colors = CardDefaults.cardColors(
-                            containerColor = Color(0xFF161A22)
+                            containerColor = ZenCardSurface
                         ),
                         border = BorderStroke(
                             width = 1.dp,
                             brush = Brush.linearGradient(
                                 listOf(
-                                    PrimaryAccent.copy(alpha = 0.8f),
-                                    SecondaryAccent.copy(alpha = 0.5f),
-                                    Color(0x33FFFFFF)
+                                    SakuraPink.copy(alpha = 0.7f),
+                                    SecondaryAccent.copy(alpha = 0.4f),
+                                    Color(0x22FFFFFF)
                                 )
                             )
                         ),
@@ -187,9 +178,9 @@ class OverlayPopupManager(private val context: Context) {
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .verticalScroll(rememberScrollState())
-                                .padding(20.dp)
+                                .padding(22.dp)
                         ) {
-                            // Top Bar: Status Pill & Dismiss Button
+                            // Top Bar: Sakura Badge & Close Button
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -197,25 +188,20 @@ class OverlayPopupManager(private val context: Context) {
                             ) {
                                 Surface(
                                     shape = RoundedCornerShape(50),
-                                    color = Color(0xFF242730),
-                                    border = BorderStroke(1.dp, PrimaryAccent.copy(alpha = 0.5f))
+                                    color = Color(0xFF251F2A),
+                                    border = BorderStroke(1.dp, SakuraPink.copy(alpha = 0.4f))
                                 ) {
                                     Row(
                                         verticalAlignment = Alignment.CenterVertically,
                                         horizontalArrangement = Arrangement.spacedBy(6.dp),
                                         modifier = Modifier.padding(horizontal = 12.dp, vertical = 5.dp)
                                     ) {
-                                        Box(
-                                            modifier = Modifier
-                                                .size(7.dp)
-                                                .clip(CircleShape)
-                                                .background(PrimaryAccent)
-                                        )
+                                        SinglePetal(tint = SakuraPink, modifier = Modifier.size(10.dp))
                                         Text(
                                             text = if (isDmScroll) "DM Reel Scroll Locked" else "Reels Scrolling Locked",
                                             fontSize = 11.sp,
                                             fontWeight = FontWeight.Bold,
-                                            color = Color(0xFFFFA6C9),
+                                            color = SakuraSoft,
                                             letterSpacing = 0.4.sp
                                         )
                                     }
@@ -226,45 +212,44 @@ class OverlayPopupManager(private val context: Context) {
                                         hide()
                                         onGoHome()
                                     },
-                                    modifier = Modifier.size(30.dp)
+                                    modifier = Modifier.size(28.dp)
                                 ) {
                                     Icon(
                                         imageVector = Icons.Default.Close,
                                         contentDescription = "Close",
-                                        tint = Color(0xFF8B949E),
+                                        tint = ZenMutedText,
                                         modifier = Modifier.size(18.dp)
                                     )
                                 }
                             }
 
-                            Spacer(modifier = Modifier.height(14.dp))
+                            Spacer(modifier = Modifier.height(12.dp))
 
-                            // Compact Icon Container
+                            // Close-up Japanese Sakura Flower in Center
                             Box(
                                 modifier = Modifier
-                                    .size(54.dp)
+                                    .size(68.dp)
                                     .clip(CircleShape)
                                     .background(
-                                        Brush.linearGradient(
-                                            listOf(PrimaryAccent.copy(alpha = 0.25f), SecondaryAccent.copy(alpha = 0.15f))
+                                        Brush.radialGradient(
+                                            listOf(SakuraPink.copy(alpha = 0.25f), Color.Transparent)
                                         )
                                     ),
                                 contentAlignment = Alignment.Center
                             ) {
-                                Icon(
-                                    imageVector = if (isDmScroll) Icons.Default.Chat else Icons.Default.Shield,
-                                    contentDescription = null,
-                                    tint = PrimaryAccent,
-                                    modifier = Modifier.size(28.dp)
+                                SakuraFlower(
+                                    modifier = Modifier.size(54.dp),
+                                    petalGradient = listOf(Color(0xFFFF9EB5), Color(0xFFFF4D74)),
+                                    stamenColor = GoldAccent
                                 )
                             }
 
                             Spacer(modifier = Modifier.height(10.dp))
 
-                            // Title
+                            // Title & Subtitle with Positive Vibe
                             Text(
-                                text = if (isDmScroll) "Back to Your Chat" else "Pause & Reflect",
-                                fontSize = 20.sp,
+                                text = if (isDmScroll) "Return to Chat" else "Mindful Pause",
+                                fontSize = 22.sp,
                                 fontWeight = FontWeight.ExtraBold,
                                 color = Color.White,
                                 textAlign = TextAlign.Center
@@ -274,22 +259,23 @@ class OverlayPopupManager(private val context: Context) {
 
                             Text(
                                 text = if (isDmScroll)
-                                    "You began scrolling reels from a chat. Don't fall into the feed — head back to your friends!"
+                                    "You watched the clip and started scrolling. Keep the real conversation going!"
                                 else
-                                    "Reels engagement detected. Protect your attention.",
+                                    "Take a deep breath. Cherish your focus and step out of the endless feed.",
                                 fontSize = 12.sp,
-                                color = Color(0xFFA0A6B2),
+                                color = ZenMutedText,
                                 textAlign = TextAlign.Center,
-                                modifier = Modifier.padding(horizontal = 6.dp)
+                                modifier = Modifier.padding(horizontal = 8.dp),
+                                lineHeight = 17.sp
                             )
 
-                            Spacer(modifier = Modifier.height(14.dp))
+                            Spacer(modifier = Modifier.height(16.dp))
 
-                            // Motivational Quote Box
+                            // Motivational Quote Card in Japanese Zen Styling
                             Surface(
                                 shape = RoundedCornerShape(16.dp),
-                                color = Color(0xFF0F1218),
-                                border = BorderStroke(1.dp, Color(0xFF242A36)),
+                                color = Color(0xFF100E14),
+                                border = BorderStroke(1.dp, Color(0x1FFFFFFF)),
                                 modifier = Modifier.fillMaxWidth()
                             ) {
                                 Column(
@@ -302,13 +288,13 @@ class OverlayPopupManager(private val context: Context) {
                                     ) {
                                         Surface(
                                             shape = RoundedCornerShape(6.dp),
-                                            color = SecondaryAccent.copy(alpha = 0.2f)
+                                            color = SakuraPink.copy(alpha = 0.15f)
                                         ) {
                                             Text(
                                                 text = currentQuote.category.uppercase(),
                                                 fontSize = 9.sp,
                                                 fontWeight = FontWeight.ExtraBold,
-                                                color = Color(0xFFD4B0FF),
+                                                color = SakuraSoft,
                                                 modifier = Modifier.padding(horizontal = 7.dp, vertical = 2.dp),
                                                 letterSpacing = 0.4.sp
                                             )
@@ -323,13 +309,13 @@ class OverlayPopupManager(private val context: Context) {
                                             Icon(
                                                 imageVector = Icons.Default.Refresh,
                                                 contentDescription = "New Quote",
-                                                tint = Color(0xFF8B949E),
+                                                tint = SakuraPink,
                                                 modifier = Modifier.size(16.dp)
                                             )
                                         }
                                     }
 
-                                    Spacer(modifier = Modifier.height(6.dp))
+                                    Spacer(modifier = Modifier.height(8.dp))
 
                                     Row(
                                         modifier = Modifier.fillMaxWidth(),
@@ -338,7 +324,7 @@ class OverlayPopupManager(private val context: Context) {
                                         Icon(
                                             imageVector = Icons.Default.FormatQuote,
                                             contentDescription = null,
-                                            tint = PrimaryAccent.copy(alpha = 0.8f),
+                                            tint = SakuraPink.copy(alpha = 0.8f),
                                             modifier = Modifier
                                                 .size(20.dp)
                                                 .padding(top = 2.dp)
@@ -349,8 +335,8 @@ class OverlayPopupManager(private val context: Context) {
                                             fontSize = 13.sp,
                                             fontStyle = FontStyle.Italic,
                                             fontWeight = FontWeight.Medium,
-                                            color = Color(0xFFE6EDF3),
-                                            lineHeight = 18.sp
+                                            color = Color(0xFFF3EDF7),
+                                            lineHeight = 19.sp
                                         )
                                     }
 
@@ -360,7 +346,7 @@ class OverlayPopupManager(private val context: Context) {
                                         text = "— ${currentQuote.author}",
                                         fontSize = 11.sp,
                                         fontWeight = FontWeight.Bold,
-                                        color = Color(0xFF9CA3AF),
+                                        color = SakuraSoft,
                                         textAlign = TextAlign.End,
                                         modifier = Modifier.fillMaxWidth()
                                     )
@@ -369,14 +355,14 @@ class OverlayPopupManager(private val context: Context) {
 
                             Spacer(modifier = Modifier.height(18.dp))
 
-                            // Action 1: Back to DMs (Primary Action)
+                            // Action 1: Back to DMs (Primary Action - Sakura Accent)
                             Button(
                                 onClick = {
                                     hide()
                                     onGoToDms()
                                 },
                                 colors = ButtonDefaults.buttonColors(
-                                    containerColor = PrimaryAccent
+                                    containerColor = SakuraDeep
                                 ),
                                 shape = RoundedCornerShape(12.dp),
                                 modifier = Modifier
@@ -407,7 +393,7 @@ class OverlayPopupManager(private val context: Context) {
                                     onGoToFeed()
                                 },
                                 colors = ButtonDefaults.buttonColors(
-                                    containerColor = Color(0xFF262626)
+                                    containerColor = Color(0xFF231F2A)
                                 ),
                                 shape = RoundedCornerShape(12.dp),
                                 modifier = Modifier
@@ -438,7 +424,7 @@ class OverlayPopupManager(private val context: Context) {
                                     onGoHome()
                                 },
                                 shape = RoundedCornerShape(12.dp),
-                                border = BorderStroke(1.dp, Color(0xFF333B4A)),
+                                border = BorderStroke(1.dp, Color(0xFF332E3C)),
                                 colors = ButtonDefaults.outlinedButtonColors(
                                     contentColor = Color(0xFFCBD5E1)
                                 ),
@@ -469,7 +455,7 @@ class OverlayPopupManager(private val context: Context) {
         try {
             windowManager.addView(composeView, params)
             overlayView = composeView
-            Log.d(TAG, "Overlay window added successfully.")
+            Log.d(TAG, "Overlay window added successfully with Japanese floral theme.")
         } catch (e: Exception) {
             Log.e(TAG, "Error adding overlay view to WindowManager", e)
             owner.onDestroy()
@@ -494,10 +480,6 @@ class OverlayPopupManager(private val context: Context) {
         }
     }
 
-    /**
-     * Pauses Instagram's reel player by requesting transient audio focus.
-     * Instagram's video playback engine (ExoPlayer) automatically pauses audio and video.
-     */
     private fun pauseInstagramPlayback() {
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
