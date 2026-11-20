@@ -221,7 +221,7 @@ fun DashboardScreen(modifier: Modifier = Modifier) {
                                 if (settings.isBlockerEnabled && isAccessibilityEnabled)
                                     Brush.radialGradient(listOf(SakuraPetalMid.copy(alpha = 0.35f), Color.Transparent))
                                 else
-                                    Color(0xFF231E24)
+                                    Brush.radialGradient(listOf(Color(0xFF231E24), Color(0xFF231E24)))
                             ),
                         contentAlignment = Alignment.Center
                     ) {
